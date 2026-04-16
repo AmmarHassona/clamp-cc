@@ -32,11 +32,19 @@ pip install clamp-cc
 
 ### Session detection
 
-**Auto-detect from current directory** — if you're inside a project that has a Claude Code session, clamp-cc picks it up automatically:
+**Auto-detect from current directory** — if you're inside a project that has a Claude Code session, clamp-cc picks it up automatically. If the project has more than one session, a session picker appears so you can choose which one to open:
 
 ```bash
 cd ~/Github/my-project
 clamp
+```
+
+![Session picker](media/session-picker.png)
+
+Use `--all-sessions` to always show the picker, even when there's only one session:
+
+```bash
+clamp --all-sessions
 ```
 
 **Project picker** — if you're not in a recognized project directory, clamp-cc shows an interactive list of all your Claude Code projects sorted by most recently modified. Use arrow keys to navigate, Enter to open:
@@ -70,6 +78,7 @@ clamp --session ~/.claude/projects/-Users-you-Github-myproject/abc123.jsonl
 | `c` | Tag as **API** — API contract (yellow) |
 | `Space` | Clear tag |
 | `g` | Generate `/compact` instruction (auto-copies to clipboard) |
+| `?` | Open tag reference / help screen |
 | `q` | Quit (asks for confirmation if any turns are tagged) |
 
 The token counter at the bottom updates live as you tag — shows total session tokens, pinned tokens, and tokens being dropped.
