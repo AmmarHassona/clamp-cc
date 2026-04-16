@@ -5,7 +5,25 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "clamp-cc"
 version = "0.1.1"
+description = "Terminal UI for targeted Claude Code context compaction — tag turns, generate /compact instructions, send via tmux."
+authors = [{ name = "Ammar Hassona" }]
+readme = "README.md"
+license = { file = "LICENSE" }
 requires-python = ">=3.11"
+keywords = ["claude", "claude-code", "compaction", "terminal", "tui", "ai"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Terminals",
+]
 dependencies = [
     "textual>=0.80.0",
     "pyperclip>=1.8.0",
