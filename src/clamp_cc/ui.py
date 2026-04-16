@@ -117,6 +117,50 @@ class CompactModal(ModalScreen[None]):
             "[green]Copied![/green]  |  Esc to close"
         )
 
+# Help modal
+
+class HelpModal(ModalScreen[None]):
+    BINDINGS = [Binding("question_mark,escape", "dismiss", "Close")]
+
+    CSS = """
+    HelpModal { align: center middle; }
+    #help-container {
+        width: 90%; height: auto;
+        border: thick $primary;
+        background: $surface;
+        padding: 1 2;
+    }
+    #help-title { text-align: center; text-style: bold; margin-bottom: 1; }
+    #help-hint  { text-align: center; color: $text-muted; margin-top: 1; }
+    """
+
+    _ENTRIES = [
+        ("PIN",  "green",  "p", "Must survive compaction verbatim.",
+         'Final decisions that can\'t be re-derived ("we\'re using postgres, not sqlite")'),
+        ("ARCH", "yellow", "a", "Architectural decision worth summarizing carefully.",
+         'Design choices with reasoning ("chose event sourcing for audit trail")'),
+        ("BUG",  "yellow", "b", "Open bug Claude needs to stay aware of.",
+         'Known issues mid-fix ("parser crashes on empty tool_use blocks")'),
+        ("TASK", "yellow", "t", "Current task state.",
+         'Where you are mid-task ("completed steps 1-3, currently on step 4")'),
+        ("API",  "yellow", "c", "API contract or interface definition.",
+         "Endpoints, function signatures, schemas that other code depends on"),
+        ("DROP", "red",    "d", "Explicitly discard this turn.",
+         "Tool call noise, superseded decisions, tangents"),
+    ]
+
+    def compose(self) -> ComposeResult:
+        rows = "\n".join(
+            f" [{color}]{tag:<4}[/{color}]  [{color}]{key}[/{color}]   {desc}\n"
+            f"        [dim]Use for: {example}[/dim]"
+            for tag, color, key, desc, example in self._ENTRIES
+        )
+        with Vertical(id="help-container"):
+            yield Label("Tag reference", id="help-title")
+            yield Static(rows, id="help-body")
+            yield Label("? or Esc to close", id="help-hint")
+
+
 # tmux pane picker modal
 
 class TmuxPickerModal(ModalScreen[bool]):
@@ -287,6 +331,7 @@ class ClampApp(App[None]):
         Binding("c", "tag('api')", "API"),
         Binding("space", "tag('none')", "CLEAR"),
         Binding("g", "generate", "GENERATE"),
+        Binding("question_mark", "help", "HELP"),
         Binding("q", "quit", "QUIT"),
     ]
 
@@ -392,6 +437,9 @@ class ClampApp(App[None]):
         self._apply_tag(Tag(tag_name))
 
     # Generate
+
+    def action_help(self) -> None:
+        self.push_screen(HelpModal())
 
     def action_generate(self) -> None:
         instruction = generate_compact_instruction(self._turns)
