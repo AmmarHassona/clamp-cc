@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "clamp-cc"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = ["textual>=0.80.0", "pyperclip>=1.8.0"]
+
+[project.urls]
+Repository = "https://github.com/ammarhassona/clamp-cc"
+
+[project.scripts]
+clamp = "clamp_cc.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
