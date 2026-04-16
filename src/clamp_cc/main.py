@@ -42,12 +42,27 @@ def _cwd_project_dir(
     return project_dir
 
 
-def _latest_jsonl_in(project_dir: Path) -> Path | None:
-    candidates = [
+def _jsonl_files_in(project_dir: Path) -> list[Path]:
+    return [
         p for p in project_dir.glob("*.jsonl")
         if "subagents" not in p.parts
     ]
+
+
+def _latest_jsonl_in(project_dir: Path) -> Path | None:
+    candidates = _jsonl_files_in(project_dir)
     return max(candidates, key=lambda p: p.stat().st_mtime) if candidates else None
+
+
+def _all_sessions_in(project_dir: Path) -> list[tuple[str, Path, float]]:
+    """Return (display_label, path, mtime) for every session in a project, newest first."""
+    results = []
+    for p in _jsonl_files_in(project_dir):
+        mtime = p.stat().st_mtime
+        title = extract_session_title(p) or p.stem
+        results.append((title, p, mtime))
+    results.sort(key=lambda x: x[2], reverse=True)
+    return results
 
 
 def _all_projects() -> list[tuple[str, Path, float]]:
@@ -62,15 +77,14 @@ def _all_projects() -> list[tuple[str, Path, float]]:
         if latest is None:
             continue
         mtime = latest.stat().st_mtime
-        # Best-effort: reverse the hash back to a path for display
         display = project_dir.name.replace("-", "/")
         results.append((display, latest, mtime))
     results.sort(key=lambda x: x[2], reverse=True)
     return results
 
 
-def _pick_project(projects: list[tuple[str, Path, float]]) -> Path | None:
-    """Curses-based arrow-key picker. Returns the selected session path or None."""
+def _curses_picker(header: str, items: list[tuple[str, Path, float]]) -> Path | None:
+    """Generic curses arrow-key picker. Returns the selected path or None."""
 
     def _run(stdscr: "curses._CursesWindow") -> Path | None:
         curses.curs_set(0)
@@ -79,12 +93,11 @@ def _pick_project(projects: list[tuple[str, Path, float]]) -> Path | None:
         while True:
             stdscr.clear()
             h, w = stdscr.getmaxyx()
-            header = "Select a project  (↑/↓ or j/k to navigate, Enter to open, q to quit)"
             stdscr.addstr(0, 0, header[:w - 1])
             stdscr.addstr(1, 0, "─" * (w - 1))
 
             visible_start = max(0, selected - (h - 4))
-            for i, (name, _, mtime) in enumerate(projects):
+            for i, (name, _, mtime) in enumerate(items):
                 row = i - visible_start
                 y = row + 2
                 if y < 2 or y >= h - 1:
@@ -103,10 +116,10 @@ def _pick_project(projects: list[tuple[str, Path, float]]) -> Path | None:
 
             if key in (curses.KEY_UP, ord("k")) and selected > 0:
                 selected -= 1
-            elif key in (curses.KEY_DOWN, ord("j")) and selected < len(projects) - 1:
+            elif key in (curses.KEY_DOWN, ord("j")) and selected < len(items) - 1:
                 selected += 1
             elif key in (ord("\n"), ord("\r")):
-                return projects[selected][1]
+                return items[selected][1]
             elif key == ord("q"):
                 return None
 
@@ -131,6 +144,12 @@ def main() -> None:
         default=False,
         help="Skip tmux pane picker and always use clipboard.",
     )
+    arg_parser.add_argument(
+        "--all-sessions",
+        action="store_true",
+        default=False,
+        help="Always show the session picker, even if the project has only one session.",
+    )
     args = arg_parser.parse_args()
 
     # 1. Explicit path
@@ -144,18 +163,30 @@ def main() -> None:
     else:
         project_dir = _cwd_project_dir()
         if project_dir is not None:
-            session_path = _latest_jsonl_in(project_dir)
-            if session_path is None:
+            sessions = _all_sessions_in(project_dir)
+            if not sessions:
                 print(f"error: no session files found in {project_dir}", file=sys.stderr)
                 sys.exit(1)
+            if len(sessions) == 1 and not args.all_sessions:
+                session_path = sessions[0][1]
+            else:
+                session_path = _curses_picker(
+                    "Select a session  (↑/↓ or j/k to navigate, Enter to open, q to quit)",
+                    sessions,
+                )
+                if session_path is None:
+                    sys.exit(0)
 
-        # 3. Interactive picker
+        # 3. Project picker
         else:
             projects = _all_projects()
             if not projects:
                 print("error: no Claude Code sessions found under ~/.claude/projects/", file=sys.stderr)
                 sys.exit(1)
-            session_path = _pick_project(projects)
+            session_path = _curses_picker(
+                "Select a project  (↑/↓ or j/k to navigate, Enter to open, q to quit)",
+                projects,
+            )
             if session_path is None:
                 sys.exit(0)
 
