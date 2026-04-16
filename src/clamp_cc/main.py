@@ -26,7 +26,9 @@ def _cwd_project_dir(
     if projects_base is None:
         projects_base = _PROJECTS_BASE
 
-    project_hash = str(cwd).replace("/", "-")
+    # as_posix() normalises backslashes to forward slashes on Windows,
+    # matching Claude Code's cross-platform project directory naming.
+    project_hash = cwd.as_posix().replace("/", "-")
     project_dir = projects_base / project_hash
 
     if not project_dir.is_dir():

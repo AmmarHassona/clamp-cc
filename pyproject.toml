@@ -6,7 +6,11 @@ build-backend = "setuptools.build_meta"
 name = "clamp-cc"
 version = "0.1.1"
 requires-python = ">=3.11"
-dependencies = ["textual>=0.80.0", "pyperclip>=1.8.0"]
+dependencies = [
+    "textual>=0.80.0",
+    "pyperclip>=1.8.0",
+    "windows-curses>=2.3.0; sys_platform == 'win32'",
+]
 
 [project.urls]
 Repository = "https://github.com/ammarhassona/clamp-cc"

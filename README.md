@@ -14,6 +14,8 @@ clamp-cc is a terminal UI for taking control of Claude Code's context compaction
 
 ## Install
 
+### macOS
+
 ```bash
 pipx install clamp-cc
 ```
@@ -27,6 +29,25 @@ python3.11 -m venv .venv
 source .venv/bin/activate
 pip install clamp-cc
 ```
+
+### Windows
+
+Install pipx if you don't have it, then install clamp-cc:
+
+```powershell
+pip install pipx
+pipx install clamp-cc
+```
+
+Or manually with a virtualenv:
+
+```powershell
+py -3.11 -m venv .venv
+.venv\Scripts\activate
+pip install clamp-cc
+```
+
+> **Note:** tmux integration is not available on Windows. clamp-cc will always use the clipboard path when running on Windows. If you're using WSL, run clamp-cc inside the WSL terminal where tmux is available.
 
 ## Usage
 
@@ -54,7 +75,11 @@ clamp --all-sessions
 **Explicit session file** — point directly at a `.jsonl` session file:
 
 ```bash
+# macOS / Linux
 clamp --session ~/.claude/projects/-Users-you-Github-myproject/abc123.jsonl
+
+# Windows (PowerShell)
+clamp --session $env:USERPROFILE\.claude\projects\-Users-you-Github-myproject\abc123.jsonl
 ```
 
 ### Workflow
