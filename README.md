@@ -15,6 +15,16 @@ clamp-cc is a terminal UI for taking control of Claude Code's context compaction
 ## Install
 
 ```bash
+pipx install clamp-cc
+```
+
+pipx is the recommended way to install CLI tools on macOS — it creates and manages the virtualenv for you automatically. If you don't have it: `brew install pipx`.
+
+Alternatively, if you prefer managing your own environment:
+
+```bash
+python3.11 -m venv .venv
+source .venv/bin/activate
 pip install clamp-cc
 ```
 
@@ -63,6 +73,17 @@ clamp --session ~/.claude/projects/-Users-you-Github-myproject/abc123.jsonl
 | `q` | Quit (asks for confirmation if any turns are tagged) |
 
 The token counter at the bottom updates live as you tag — shows total session tokens, pinned tokens, and tokens being dropped.
+
+## Tagging guide
+
+| Tag | When to use it | Example |
+|-----|---------------|---------|
+| **PIN** | Decisions that can't be re-derived from the code, things Claude must never lose | "We switched to Postgres because SQLite couldn't handle concurrent writes" |
+| **ARCH** | Design choices where the reasoning matters as much as the decision | "Auth is stateless JWT, session state lives in Redis, here's why" |
+| **BUG** | Open issues you're mid-fix, enough context to pick back up without re-reading everything | "Parser crashes on empty tool_use blocks, traced to line 47, not fixed yet" |
+| **TASK** | Current task state so the next session starts where this one left off | "Finished the modal, next step is wiring the generator to the store" |
+| **API** | Contracts, schemas, and interfaces that other parts of the code depend on | "GET /sessions returns `{id, title, mtime}[]`, max 100 results, no pagination yet" |
+| **DROP** | Noise, dead ends, and superseded turns that will only confuse the summary | Initial brainstorming that went nowhere, a refactor that got reverted |
 
 ## tmux integration
 
