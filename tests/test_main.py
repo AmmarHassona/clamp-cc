@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from clamp_cc.main import _cwd_project_dir
+from clamp_cc.main import _cwd_project_dir, _encode_project_path
 
 
 def _make_project_dir(base: Path, name: str) -> Path:
@@ -71,3 +71,21 @@ def test_no_match_when_project_dir_missing(tmp_path):
 
     result = _cwd_project_dir(cwd=cwd, projects_base=tmp_path)
     assert result is None
+
+
+# ---------------------------------------------------------------------------
+# Path encoding
+# ---------------------------------------------------------------------------
+
+def test_encode_posix_path():
+    assert _encode_project_path(Path("/Users/foo/project")) == "-Users-foo-project"
+
+
+def test_encode_windows_path():
+    # Claude Code on Windows replaces both backslashes and colons with dashes
+    assert _encode_project_path(Path("C:\\Users\\foo\\project")) == "C--Users-foo-project"
+
+
+def test_encode_strips_non_ascii():
+    # Non-ASCII characters collapse to -, matching Claude Code's encoder
+    assert _encode_project_path(Path("/Users/fooé/bar")) == "-Users-foo--bar"

@@ -4,11 +4,25 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-from clamp_cc.parser import extract_session_title, parse_session
+from clamp_cc.parser import extract_session_title
 from clamp_cc.ui import ClampApp
 
 
 _PROJECTS_BASE = Path.home() / ".claude" / "projects"
+
+
+def _encode_project_path(path: Path) -> str:
+    """Encode an absolute path into Claude Code's project directory name.
+
+    Replaces path separators (both / and \\) and drive-letter colons with -,
+    then maps any remaining non-ASCII-alphanumeric character to - as well.
+    Matches the algorithm Claude Code uses on macOS, Linux, and Windows.
+    """
+    raw = str(path).replace("\\", "-").replace("/", "-")
+    return "".join(
+        c if (c.isascii() and c.isalnum()) or c == "-" else "-"
+        for c in raw
+    )
 
 
 def _cwd_project_dir(
@@ -26,9 +40,7 @@ def _cwd_project_dir(
     if projects_base is None:
         projects_base = _PROJECTS_BASE
 
-    # as_posix() normalises backslashes to forward slashes on Windows,
-    # matching Claude Code's cross-platform project directory naming.
-    project_hash = cwd.as_posix().replace("/", "-")
+    project_hash = _encode_project_path(cwd)
     project_dir = projects_base / project_hash
 
     if not project_dir.is_dir():
@@ -61,7 +73,7 @@ def _all_sessions_in(project_dir: Path) -> list[tuple[str, Path, float]]:
     results = []
     for p in _jsonl_files_in(project_dir):
         mtime = p.stat().st_mtime
-        title = extract_session_title(p) or p.stem
+        title = extract_session_title(p, max_lines=500) or p.stem
         results.append((title, p, mtime))
     results.sort(key=lambda x: x[2], reverse=True)
     return results

@@ -48,6 +48,8 @@ pip install clamp-cc
 ```
 
 > **Note:** tmux integration is not available on Windows. clamp-cc will always use the clipboard path when running on Windows. If you're using WSL, run clamp-cc inside the WSL terminal where tmux is available.
+>
+> **Windows Terminal is recommended** over the legacy `cmd.exe` / PowerShell console as the TUI renders correctly there.
 
 ## Usage
 
@@ -141,11 +143,11 @@ clamp --no-tmux
 ## How the generated instruction looks
 
 ```
-/compact Always preserve: [turn 4: "use postgres, not sqlite — decided after..."],
-[turn 12: "auth middleware rewrite is blocked on legal sign-off"].
-Focus summary on: [turn 7: "GET /sessions returns paginated list, max 100..."],
-[turn 19: "open bug: parser crashes on empty tool_use blocks"].
-Discard: [turn 2: "initial brainstorm, superseded"], [turn 9: "tangent about..."].
+/compact Always preserve: ["use postgres, not sqlite — decided after..."],
+["auth middleware rewrite is blocked on legal sign-off"].
+Focus summary on: ["GET /sessions returns paginated list, max 100..."],
+["open bug: parser crashes on empty tool_use blocks"].
+Discard: ["initial brainstorm, superseded"], ["tangent about..."].
 Summarize everything else aggressively.
 ```
 

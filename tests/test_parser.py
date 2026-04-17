@@ -61,9 +61,10 @@ def test_assistant_thinking_rendered():
 
 def test_token_count_assistant():
     turns = parse_session(FIXTURE)
-    # turns[1]: output_tokens = 120, turns[2]: output_tokens = 45
-    assert turns[1].token_count == 120
-    assert turns[2].token_count == 45
+    # turns[1]: input=500 + output=120 = 620
+    # turns[2]: input=800 + output=45 = 845
+    assert turns[1].token_count == 620
+    assert turns[2].token_count == 845
 
 
 def test_default_tag_is_none():

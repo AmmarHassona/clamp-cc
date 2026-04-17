@@ -28,7 +28,6 @@ def test_pin_tag_in_preserve_section():
     turns = [make_turn(0, "important context", tag=Tag.PIN)]
     result = generate_compact_instruction(turns)
     assert "Always preserve:" in result
-    assert "turn 0:" in result
     assert "important context" in result
 
 
@@ -36,14 +35,14 @@ def test_arch_tag_in_focus_section():
     turns = [make_turn(2, "use postgres for storage", tag=Tag.ARCH)]
     result = generate_compact_instruction(turns)
     assert "Focus summary on:" in result
-    assert "turn 2:" in result
+    assert "use postgres for storage" in result
 
 
 def test_bug_tag_in_focus_section():
     turns = [make_turn(3, "parser crashes on empty input", tag=Tag.BUG)]
     result = generate_compact_instruction(turns)
     assert "Focus summary on:" in result
-    assert "turn 3:" in result
+    assert "parser crashes on empty input" in result
 
 
 def test_task_tag_in_focus_section():
@@ -62,7 +61,7 @@ def test_drop_tag_in_discard_section():
     turns = [make_turn(1, "irrelevant tangent", tag=Tag.DROP)]
     result = generate_compact_instruction(turns)
     assert "Discard:" in result
-    assert "turn 1:" in result
+    assert "irrelevant tangent" in result
 
 
 def test_none_tag_not_mentioned():
@@ -80,8 +79,8 @@ def test_multiple_pins():
         make_turn(1, "second important", tag=Tag.PIN),
     ]
     result = generate_compact_instruction(turns)
-    assert "turn 0:" in result
-    assert "turn 1:" in result
+    assert "first important" in result
+    assert "second important" in result
 
 
 def test_multiple_focus_tags_grouped():

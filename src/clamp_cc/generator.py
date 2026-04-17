@@ -3,7 +3,7 @@ from clamp_cc.models import Tag, Turn
 
 def _identifier(turn: Turn) -> str:
     snippet = turn.content[:100].replace("\n", " ").replace('"', "'")
-    return f'turn {turn.index}: "{snippet}"'
+    return f'"{snippet}"'
 
 
 def generate_compact_instruction(turns: list[Turn]) -> str:

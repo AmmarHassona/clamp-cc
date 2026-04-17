@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import os
 import subprocess
+import sys
+import traceback
 from datetime import datetime
 from pathlib import Path
 
@@ -341,6 +343,7 @@ class ClampApp(App[None]):
         self._title = title
         self._use_tmux = use_tmux
         self._turns: list[Turn] = []
+        self._has_generated = False
 
     def compose(self) -> ComposeResult:
         yield LoadingIndicator()
@@ -357,7 +360,8 @@ class ClampApp(App[None]):
             n_restored = store.load_tags(self._session_path.stem, turns)
             store.trim_old_events()
         except Exception:
-            pass
+            print("clamp-cc: failed to load persisted tags:", file=sys.stderr)
+            traceback.print_exc()
         return turns, n_restored
 
     async def on_worker_state_changed(self, event: Worker.StateChanged) -> None:
@@ -431,7 +435,8 @@ class ClampApp(App[None]):
         try:
             store.save_tag(self._session_path.stem, row.turn)
         except Exception:
-            pass
+            print("clamp-cc: failed to persist tag:", file=sys.stderr)
+            traceback.print_exc()
 
     def action_tag(self, tag_name: str) -> None:
         self._apply_tag(Tag(tag_name))
@@ -443,6 +448,7 @@ class ClampApp(App[None]):
 
     def action_generate(self) -> None:
         instruction = generate_compact_instruction(self._turns)
+        self._has_generated = True
 
         if self._use_tmux and _in_tmux():
             panes = _list_tmux_panes()
@@ -460,7 +466,7 @@ class ClampApp(App[None]):
 
     def action_quit(self) -> None:
         n_tagged = sum(1 for t in self._turns if t.tag != Tag.NONE)
-        if n_tagged == 0:
+        if n_tagged == 0 or self._has_generated:
             self.exit()
         else:
             self.push_screen(

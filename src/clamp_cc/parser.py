@@ -29,14 +29,14 @@ def _extract_content(message: dict) -> str:
 
 def _token_count(message: dict) -> int:
     usage = message.get("usage", {})
-    return usage.get("output_tokens", 0)
+    return usage.get("input_tokens", 0) + usage.get("output_tokens", 0)
 
 
 def parse_session(path: Path) -> list[Turn]:
     """Parse a Claude Code JSONL session file into a list of Turn objects."""
     raw_lines: list[dict] = []
 
-    with path.open() as f:
+    with path.open(encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if not line:
@@ -78,10 +78,16 @@ def parse_session(path: Path) -> list[Turn]:
     return result
 
 
-def extract_session_title(path: Path) -> str:
-    """Return the ai-title string for this session, or '' if not found."""
-    with path.open() as f:
-        for line in f:
+def extract_session_title(path: Path, max_lines: int | None = None) -> str:
+    """Return the ai-title string for this session, or '' if not found.
+
+    max_lines caps how many lines to scan — used by the picker to keep the
+    project listing fast on large sessions.
+    """
+    with path.open(encoding="utf-8") as f:
+        for i, line in enumerate(f):
+            if max_lines is not None and i >= max_lines:
+                break
             line = line.strip()
             if not line:
                 continue
@@ -89,15 +95,3 @@ def extract_session_title(path: Path) -> str:
             if obj.get("type") == "ai-title":
                 return obj.get("aiTitle", "")
     return ""
-
-
-def find_latest_session() -> Path:
-    """Find the most recently modified .jsonl session file under ~/.claude/projects/."""
-    base = Path.home() / ".claude" / "projects"
-    candidates = [
-        p for p in base.glob("*/*.jsonl")
-        if "subagents" not in p.parts
-    ]
-    if not candidates:
-        raise FileNotFoundError(f"No session files found under {base}")
-    return max(candidates, key=lambda p: p.stat().st_mtime)

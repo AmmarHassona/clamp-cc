@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "clamp-cc"
-version = "0.1.1"
+version = "0.1.2"
 description = "Terminal UI for targeted Claude Code context compaction — tag turns, generate /compact instructions, send via tmux."
 authors = [{ name = "Ammar Hassona" }]
 readme = "README.md"
