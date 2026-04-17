@@ -125,7 +125,7 @@ The token counter at the bottom updates live as you tag — shows total session 
 
 If you're running inside a tmux session, pressing `g` opens a pane picker instead of going straight to the clipboard modal. Select the pane running Claude Code, hit Enter, and clamp-cc fires the `/compact` instruction directly into that pane — no switching windows, no pasting.
 
-<video src="media/tmux.mp4" controls width="100%"></video>
+https://github.com/user-attachments/assets/d9f74dd6-b2e9-4299-a1b6-e7574ea4a18f
 
 Recommended setup — run Claude Code first, then split and open clamp-cc alongside it:
 
