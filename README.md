@@ -164,6 +164,13 @@ Discard: ["initial brainstorm, superseded"], ["tangent about..."].
 Summarize everything else aggressively.
 ```
 
+## Security & privacy
+
+- **No network calls.** clamp-cc is fully offline as it does not contact Anthropic servers or any other host.
+- **No telemetry.** Nothing is tracked or logged externally.
+- **Local-only file access.** Reads Claude Code session files under `~/.claude/projects/` and writes tags to `~/.claude/clamp_cc_tags.db`. No other paths are touched.
+- **No elevated permissions.** Runs as a normal user process. No `sudo`, no `--dangerously-skip-permissions`, no shared system files modified.
+
 ## Tag persistence
 
 Tags are saved to `~/.claude/clamp_cc_tags.db` as you work. When you reopen a session, your tags are restored automatically and the session title shows how many were recovered. Events older than 90 days are trimmed on each open.
