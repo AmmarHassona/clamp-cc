@@ -1,5 +1,6 @@
 # clamp-cc
 
+![CI](https://github.com/AmmarHassona/clamp-cc/actions/workflows/ci.yml/badge.svg)
 ![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)
 ![PyPI](https://img.shields.io/pypi/v/clamp-cc.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
@@ -51,6 +52,14 @@ pip install clamp-cc
 >
 > **Windows Terminal is recommended** over the legacy `cmd.exe` / PowerShell console as the TUI renders correctly there.
 
+## Uninstall
+
+```bash
+pipx uninstall clamp-cc
+```
+
+Same command on macOS, Linux, and Windows. If you installed into a manual virtualenv, just delete the virtualenv directory.
+
 ## Usage
 
 ### Session detection
@@ -91,6 +100,10 @@ clamp --session $env:USERPROFILE\.claude\projects\-Users-you-Github-myproject\ab
 3. Tag turns using the keybindings below
 4. Hit `g` to generate the `/compact` instruction — it's copied to clipboard automatically
 5. Paste it into Claude Code, or use tmux integration to send it directly (see below)
+
+## When to use clamp-cc
+
+Run it when your session is getting long and you know compaction is coming. The sweet spot is around 60–70% context utilization, before Claude decides what to drop. You can also run it right after an auto-compact to pre-tag what matters for the next round. Tagging early means the next `/compact` preserves the decisions, bugs, and contracts you actually care about instead of summarizing them into oblivion.
 
 ## Keybindings
 
